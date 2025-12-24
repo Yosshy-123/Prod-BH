@@ -10,13 +10,13 @@ A lightweight script that, when embedded in a web page, allows you to repeatedly
 
 ## Installation / Setup
 
-1. Copy the repository's [`history.js`](./history.js) into your project.
+1. Copy the repository's [`history.min.js`](./history.min.js) into your project.
 2. Include it in your HTML.
 
 Example:
 
 ```html
-<script src="./history.js" defer></script>
+<script src="./history.min.js" defer></script>
 ```
 
 ---
