@@ -1,6 +1,6 @@
 # Production of Browser History
 
-A lightweight script that, when embedded in a web page, allows you to repeatedly add entries to the browser history by pressing the `¥` key without changing the appearance.
+This is a lightweight script that, when embedded in a web page, repeatedly adds entries to the browser history without altering the page's appearance.
 
 ---
 
@@ -16,7 +16,7 @@ A lightweight script that, when embedded in a web page, allows you to repeatedly
 Example:
 
 ```html
-<script src="./history.min.js" defer></script>
+<script src="./history.min.js"></script>
 ```
 
 ---
