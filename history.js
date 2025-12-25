@@ -1,29 +1,33 @@
-const base = location.href.split('#')[0];
-let running = true;
-const workerCode = `function randId(len){const bytes=crypto.getRandomValues(new Uint8Array(6));let n=0n;for(let i=0;i<bytes.length;i++)n=(n<<8n)|BigInt(bytes[i]);let s=n.toString(36);while(s.length<len)s='0'+s;return s.slice(0,len);}let running=true;const ID_LEN=8;const WORKER_BATCH_SIZE=512;function produce(){if(!running)return;const out=new Array(512);for(let i=0;i<WORKER_BATCH_SIZE;i++)out[i]=randId(ID_LEN);postMessage(out);setTimeout(produce,0);}self.onmessage=e=>{if(e.data==='stop')running=false;};produce();`;
-const blob = new Blob([workerCode], {
-	type: 'application/javascript'
-});
-const worker = new Worker(URL.createObjectURL(blob));
-const q = [];
-worker.onmessage = e => {
-	Array.prototype.push.apply(q, e.data);
-	if (q.length > 200000) q.splice(0, q.length - 200000);
-};
+(function() {
+	const base = location.href.split('#')[0];
 
-function flush() {
-	if (!running) return;
-	const MAX_PUSH_PER_TICK = 512;
-	const count = Math.min(q.length, MAX_PUSH_PER_TICK);
-	for (let i = 0; i < count; i++) {
-		const id = q.shift();
-		history.pushState(null, '', base + '#' + id);
+	let running = false;
+	let counter = 0;
+	let intervalId = null;
+
+	function tick() {
+		counter++;
+		history.pushState(null, '', base + '#' + counter);
 	}
-	Promise.resolve().then(flush);
-}
-Promise.resolve().then(flush);
-window.addEventListener('beforeunload', () => {
-	running = false;
-	worker.postMessage('stop');
-	worker.terminate();
-});
+
+	function start() {
+		if (running) return;
+		running = true;
+		const existing = location.hash.replace('#', '');
+		counter = existing ? Number(existing) : 0;
+		intervalId = setInterval(tick, 25);
+	}
+
+	function stop() {
+		if (!running) return;
+		running = false;
+		if (intervalId !== null) {
+			clearInterval(intervalId);
+			intervalId = null;
+		}
+	}
+
+	start();
+
+	window.addEventListener('beforeunload', stop);
+})();
